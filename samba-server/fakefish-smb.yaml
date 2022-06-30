@@ -33,6 +33,7 @@ metadata:
   labels:
     app: samba-server
   name: samba-server
+  namespace: fakefish
 spec:
   replicas: 1
   selector:
@@ -59,18 +60,66 @@ spec:
           protocol: TCP
         - containerPort: 445
           protocol: TCP
-      volumeMounts:
-      - mountPath: /isos
-        name: smb-volume
-    volumes:
-    - name: smb-volume
-      emptyDir: {}
+        env:
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        volumeMounts:
+        - mountPath: /isos
+          name: smb-volume
+      - image: busybox
+        command:
+        - /bin/sh
+        - -c
+        - sleep 100000000
+        name: busybox
+        resources: {}
+        env:
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        volumeMounts:
+        - mountPath: /isos
+          name: smb-volume
+        - mountPath: /custom-scripts
+          name: custom-scripts
+      - image: quay.io/mavazque/fakefish:hpe
+        args:
+        - --listen-port=9000
+        - --tls-mode=disabled
+        - --remote-bmc=172.20.10.10
+        name: fakefish
+        resources: {}
+        ports:
+        - containerPort: 9000
+          protocol: TCP
+          name: http-9000
+        env:
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        volumeMounts:
+        - mountPath: /isos
+          name: smb-volume
+        - mountPath: /opt/fakefish/custom_scripts
+          name: custom-scripts
+      volumes:
+      - name: smb-volume
+        emptyDir: {}
+      - name: custom-scripts
+        configMap:
+          defaultMode: 0755
+          name: custom-scripts
 status: {}
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: samba-server
+  namespace: fakefish
   labels:
     name: samba-server
 spec:

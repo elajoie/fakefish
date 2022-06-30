@@ -4,12 +4,12 @@ IMAGE_NAME ?= fakefish
 IMAGE_URL ?= $(REGISTRY)/$(IMAGE_NAMESPACE)/$(IMAGE_NAME)
 TAG ?= latest
 
-.PHONY: build-dell build-custom pre-reqs
+.PHONY: build-supermicro build-custom pre-reqs
 
 default: pre-reqs build-custom
 
-build-dell:
-	podman build . -f supermicro_scripts/Containerfile -t ${IMAGE_URL}:${TAG}
+build-supermicro:
+	podman build . -f samba_supermicro_scripts/Containerfile -t ${IMAGE_URL}:${TAG}
 
 build-custom: pre-reqs
 	podman build . -f custom_scripts/Containerfile -t ${IMAGE_URL}:${TAG}

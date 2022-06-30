@@ -3,14 +3,14 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    kubernetes.io/metadata.name: test-samba-server
-  name: test-samba-server
+    kubernetes.io/metadata.name: fakefish
+  name: fakefish
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   creationTimestamp: null
-  namespace: test-samba-server
+  namespace: fakefish
   name: samba-sa
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -24,7 +24,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: samba-sa
-  namespace: test-samba-server
+  namespace: fakefish
 ---
 apiVersion: apps/v1
 kind: Deployment

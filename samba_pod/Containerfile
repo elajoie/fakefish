@@ -1,29 +1,22 @@
 FROM registry.fedoraproject.org/fedora:36
 
-RUN mkdir -p /home/share/iso
-
-USER 0
-
-
+RUN mkdir -p /home/share/iso && \
+    mkdir -p /var/log/samba
 
 RUN set -x && \
     dnf -y update && \
     dnf install -y samba && \
-    smbpasswd -n -a cifsuser && \
-    semanage fcontext --add --type "samba_share_t" "/home/share(/.*)?" && \
-    restorecon -R /home/share && \
     dnf clean all && \
     rm -rf /var/cache/yum /var/cache/dnf
 
-
-
-# The stars in the command below will only copy those files if they exist
-COPY smb.conf
+COPY smb.conf /etc/samba/
 
 WORKDIR /home/share/
 
-RUN chown -R 1024 /home/share/
+RUN chown -R 1024 /home/share/ && \
+    chown -R 1024 /var/log/samba/ && \
+    chown -R 1024 /etc/samba/
 
 USER 1024
 
-ENTRYPOINT ["/usr/bin/python3", "-u", "/opt/fakefish/fakefish.py"] 
+ENTRYPOINT ["/usr/sbin/smbd", "-s", "/etc/samba/smb.conf", "-F"] 

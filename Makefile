@@ -9,7 +9,7 @@ TAG ?= latest
 default: pre-reqs build-custom
 
 build-dell:
-	podman build . -f dell_scripts/Containerfile -t ${IMAGE_URL}:${TAG}
+	podman build . -f supermicro_scripts/Containerfile -t ${IMAGE_URL}:${TAG}
 
 build-custom: pre-reqs
 	podman build . -f custom_scripts/Containerfile -t ${IMAGE_URL}:${TAG}

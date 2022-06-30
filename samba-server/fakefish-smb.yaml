@@ -111,6 +111,7 @@ spec:
         emptyDir: {}
       - name: custom-scripts
         configMap:
+          defaultMode: 0755
           name: custom-scripts
 status: {}
 ---

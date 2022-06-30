@@ -1,0 +1,86 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    kubernetes.io/metadata.name: test-samba-server
+  name: test-samba-server
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  creationTimestamp: null
+  namespace: test-samba-server
+  name: samba-sa
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-admin-for-samba
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: samba-sa
+  namespace: test-samba-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: samba-server
+  name: samba-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: samba-server
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: samba-server
+    spec:
+      serviceAccount: samba-sa
+      serviceAccountName: samba-sa
+      containers:
+      - image: docker.io/dperson/samba
+        args:
+        - -p
+        - -s ISOS;/isos;yes;yes;yes
+        name: samba
+        resources: {}
+        ports:
+        - containerPort: 139
+          protocol: TCP
+        - containerPort: 445
+          protocol: TCP
+      volumeMounts:
+      - mountPath: /isos
+        name: smb-volume
+    volumes:
+    - name: smb-volume
+      emptyDir: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: samba-server
+  labels:
+    name: samba-server
+spec:
+  type: NodePort
+  ports:
+  - port: 139
+    nodePort: 31139
+    name: port-139
+  - port: 445
+    name: port-445
+    nodePort: 31445
+  selector:
+    app: samba-server

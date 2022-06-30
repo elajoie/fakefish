@@ -32,7 +32,7 @@ spec:
   revisionHistoryLimit: 10
   progressDeadlineSeconds: 600
 
-  ---
+---
 
 kind: Service
 apiVersion: v1

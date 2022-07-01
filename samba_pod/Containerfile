@@ -1,8 +1,6 @@
 FROM registry.fedoraproject.org/fedora:latest
 
-RUN mkdir -p /srv/media && \
-    mkdir -p /srv/public && \
-    mkdir -p /srv/share/iso
+RUN mkdir -p /srv/public/iso
 
 RUN set -x && \
     dnf -y update && \
@@ -12,14 +10,11 @@ RUN set -x && \
 
 COPY smb.conf /etc/samba/smb.conf
 
-EXPOSE 445
+EXPOSE 139
 
-WORKDIR /home/share/
+WORKDIR /srv/public/
 
-RUN chown -R 1024 /srv/media && \
-    chown -R 1024 /srv/public && \
-    chown -R 1024 /srv/share
-
-USER 1024
+RUN chmod 770 /var/log/samba && \
+    chmod -R 777 /srv/public/
 
 ENTRYPOINT ["/usr/sbin/smbd", "-F", "--no-process-group", "-s", "/etc/samba/smb.conf"]

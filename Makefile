@@ -8,8 +8,9 @@ TAG ?= latest
 
 default: pre-reqs build-custom
 
-build-supermicro:
+build-samba-supermicro:
 	podman build . -f samba_supermicro_scripts/Containerfile -t ${IMAGE_URL}:${TAG}
+	podman build . -f samba_pod/Containerfile -t samba
 
 build-custom: pre-reqs
 	podman build . -f custom_scripts/Containerfile -t ${IMAGE_URL}:${TAG}

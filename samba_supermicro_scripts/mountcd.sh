@@ -9,8 +9,13 @@
 #### BMC_PASSWORD - Has the password configured in the BMH/InstallConfig and that is used to access BMC_ENDPOINT
 
 ISO=${1}
-ISO_URL=$(echo $ISO| cut -d '/' -f-3)
-ISO_PATH='/'$(echo $ISO| cut -d '/' -f4-)
+#ISO_URL=$(echo $ISO| cut -d '/' -f-3)
+ISO_URL=sm1-fakefish.apps.sno.home.lab
+#ISO_PATH='/'$(echo $ISO| cut -d '/' -f4-)
+ISO_PATH=/public/iso/image.iso
+
+#copy ISO to sambe share
+wget ${ISO} -O /srv/public/iso/image.iso
 
 # UnMount image just in case
 curl -X POST -s -k -u ''"${BMC_USERNAME}"'':''"${BMC_PASSWORD}"'' https://${BMC_ENDPOINT}/redfish/v1/Managers/1/VM1/CfgCD/Actions/IsoConfig.UnMount -d ""

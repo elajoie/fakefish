@@ -10,11 +10,14 @@ RUN set -x && \
 
 COPY smb.conf /etc/samba/smb.conf
 
-EXPOSE 139
-
 WORKDIR /srv/public/
 
-RUN chmod 770 /var/log/samba && \
+RUN chmod -R 777 /var/log/samba && \
+    chmod 777 /etc/samba/smb.conf && \
     chmod -R 777 /srv/public/
+
+RUN chown -R 1024 /srv/public/
+
+USER 1024
 
 ENTRYPOINT ["/usr/sbin/smbd", "-F", "--no-process-group", "-s", "/etc/samba/smb.conf"]
